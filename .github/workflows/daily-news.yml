@@ -1,0 +1,29 @@
+name: Daily News Fetcher
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Run daily at midnight UTC (8 AM SGT)
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  fetch-news:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      
+      - name: Install dependencies
+        run: |
+          pip install requests google-auth-oauthlib google-auth-httplib2 google-api-python-client
+      
+      - name: Run news fetcher
+        env:
+          NEWSAPI_KEY: ${{ secrets.NEWSAPI_KEY }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          SERVICE_ACCOUNT_JSON: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+        run: python fetch_news.py
